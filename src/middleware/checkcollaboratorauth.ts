@@ -31,6 +31,8 @@ export const checkRole: RequestHandler = async (
 
         if (user) {
           req.collaboratorId = user.id;
+          req.leader = user.leader;
+          req.sector = user.descCostCenter;
           next();
         }
       }
