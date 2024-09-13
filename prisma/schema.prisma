@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model BaseCollaborator {
+  id             Int       @id @default(autoincrement())
+  name           String
+  cardNumber     String
+  cpf            String    @unique
+  leader         String
+  costCenter     String
+  descCostCenter String
+  industry       String
+  Register       Register?
+}
+
+model Register {
+  id              Int              @id @default(autoincrement())
+  phrase          String
+  howToContribute String
+  imgPath         String?
+  createdAt       DateTime         @default(now())
+  collaborator    BaseCollaborator @relation(fields: [collaboratorId], references: [id])
+  collaboratorId  Int              @unique
+}
