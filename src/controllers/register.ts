@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
 import { prisma } from '../services/prisma';
 import path from 'path';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export const createNewPhrase: RequestHandler = async (req, res) => {
   try {
@@ -49,8 +50,16 @@ export const createNewPhrase: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        return res
+          .status(400)
+          .json({ message: 'Você só pode criar uma frase!' });
+      }
+    }
     res.status(500).json({
-      message: 'Erro interno do servidor',
+      message: 'erro interno no servidor',
     });
   }
 };

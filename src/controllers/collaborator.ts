@@ -1,26 +1,33 @@
 import { RequestHandler } from 'express';
 import { prisma } from '../services/prisma';
+import bcrypt from 'bcryptjs';
 
 export const checkCollaborator: RequestHandler = async (req, res) => {
   try {
     const body = req.body;
 
     if (body) {
-      const collaboratorCpf = await prisma.baseCollaborator.findUnique({
+      const collaboratorCard = await prisma.baseCollaborator.findFirst({
         where: {
-          cpf: body.cpf,
+          cardNumber: body.cardNumber,
         },
       });
 
-      if (!collaboratorCpf)
+      if (!collaboratorCard)
         return res.status(404).json({
           message: 'usuário não encontrado',
         });
 
+      const cpfMatch = await bcrypt.compare(body.cpf, collaboratorCard.cpf);
+
+      if (!cpfMatch)
+        return res
+          .status(403)
+          .json({ message: 'cpf e/ou cartão estão incorretos' });
+
       const authCollaborator = await prisma.baseCollaborator.findUnique({
         where: {
-          id: collaboratorCpf.id,
-          cardNumber: body.cardNumber,
+          id: collaboratorCard.id,
         },
         select: {
           id: true,
@@ -34,7 +41,7 @@ export const checkCollaborator: RequestHandler = async (req, res) => {
 
       if (!authCollaborator)
         return res.status(403).json({
-          message: 'cartão e CPF não correspondem!',
+          message: 'colaborador não encontrado',
         });
 
       const existRegister = await prisma.register.findUnique({

@@ -17,6 +17,8 @@ model BaseCollaborator {
   descCostCenter String
   industry       String
   Register       Register?
+  role           String    @default("USER")
+  Vote           Vote[]
 }
 
 model Register {
@@ -27,4 +29,16 @@ model Register {
   createdAt       DateTime         @default(now())
   collaborator    BaseCollaborator @relation(fields: [collaboratorId], references: [id])
   collaboratorId  Int              @unique
+  Vote            Vote[]
+}
+
+model Vote {
+  id             Int              @id @default(autoincrement())
+  register       Register         @relation(fields: [registerId], references: [id])
+  registerId     Int
+  collaborator   BaseCollaborator @relation(fields: [collaboratorId], references: [id])
+  collaboratorId Int
+  createdAt      DateTime         @default(now())
+
+  @@unique([registerId, collaboratorId])
 }
