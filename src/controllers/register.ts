@@ -2,14 +2,18 @@ import { RequestHandler } from 'express';
 import { prisma } from '../services/prisma';
 import path from 'path';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { TypeRequestUser } from '../types/typesstaff';
 
-export const createNewPhrase: RequestHandler = async (req, res) => {
+export const createNewPhrase: RequestHandler = async (
+  req: TypeRequestUser,
+  res
+) => {
   try {
-    const { phrase, howToContribute, collaboratorId, sector, leader } =
-      req.body;
+    const { phrase, howToContribute } = req.body;
+    const collaboratorId = req.collaboratorId;
     const imagem = req.file;
 
-    if (!imagem) {
+    if (!imagem && collaboratorId) {
       const statusRegister = await prisma.register.create({
         data: {
           phrase,
@@ -28,26 +32,42 @@ export const createNewPhrase: RequestHandler = async (req, res) => {
       });
     }
 
-    const filterSector = sector
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-zA-Z0-9\s]/g, '');
-    const imagemPath = path.join(filterSector + '_' + leader, imagem.filename);
+    if (imagem && collaboratorId) {
+      const findCollaborator = await prisma.baseCollaborator.findUnique({
+        where: {
+          id: +collaboratorId,
+        },
+      });
 
-    const statusCreatedNewPhrase = await prisma.register.create({
-      data: {
-        phrase,
-        howToContribute,
-        collaboratorId: +collaboratorId,
-        imgPath: imagemPath,
-      },
-    });
+      if (!findCollaborator)
+        return res.status(404).json({
+          message: 'colaborador não encontado',
+        });
 
-    res.status(200).json({
-      message: 'Registro com foto criado com sucesso!',
-      statusCreatedNewPhrase,
-      imagemPath,
-    });
+      const filterSector = findCollaborator.descCostCenter
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9\s]/g, '');
+      const imagemPath = path.join(
+        filterSector + '_' + findCollaborator.leader,
+        imagem.filename
+      );
+
+      const statusCreatedNewPhrase = await prisma.register.create({
+        data: {
+          phrase,
+          howToContribute,
+          collaboratorId: +collaboratorId,
+          imgPath: imagemPath,
+        },
+      });
+
+      res.status(200).json({
+        message: 'Registro com foto criado com sucesso!',
+        statusCreatedNewPhrase,
+        imagemPath,
+      });
+    }
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {

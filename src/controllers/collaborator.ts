@@ -1,6 +1,9 @@
 import { RequestHandler } from 'express';
 import { prisma } from '../services/prisma';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+
+const SECRET_KEY: string | undefined = process.env.SECRET_KEY;
 
 export const checkCollaborator: RequestHandler = async (req, res) => {
   try {
@@ -55,10 +58,18 @@ export const checkCollaborator: RequestHandler = async (req, res) => {
           message: 'você já tem uma frase cadastrada! Obrigado!',
         });
 
-      res.status(200).json({
-        validation: true,
-        authCollaborator,
-      });
+      if (SECRET_KEY) {
+        const token = jwt.sign(
+          {
+            id: authCollaborator.id,
+            name: authCollaborator.name,
+          },
+          SECRET_KEY,
+          { expiresIn: '2h' }
+        );
+
+        if (token) res.status(200).json({ token });
+      }
     }
   } catch (error) {
     console.log(error);
