@@ -33,6 +33,8 @@ export const checkRole: RequestHandler = async (
           req.collaboratorId = user.id;
           req.leader = user.leader;
           req.sector = user.descCostCenter;
+          req.name = user.name;
+          req.card = user.cardNumber;
           next();
         }
       }

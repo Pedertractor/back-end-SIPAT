@@ -29,12 +29,14 @@ const storage = multer.diskStorage({
       callback(null, uploadDir);
     }
   },
-  filename(req, file, callback) {
-    const { name, card } = req.body;
-
-    const filterName = name.replace(/ /g, '_');
-    const ext = path.extname(file.originalname);
-    callback(null, `${filterName}_${card}${ext}`);
+  filename(req: TypeRequestUser, file, callback) {
+    const name = req.name;
+    const card = req.card;
+    if (name && card) {
+      const filterName = name.replace(/ /g, '_');
+      const ext = path.extname(file.originalname);
+      callback(null, `${filterName}_${card}${ext}`);
+    }
   },
 });
 
