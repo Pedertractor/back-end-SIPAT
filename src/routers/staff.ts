@@ -3,6 +3,7 @@ import {
   deleteVote,
   loginStaff,
   mostRegisterVote,
+  revalidLoginStaff,
   showVotesByUser,
   voteStaff,
 } from '../controllers/staff';
@@ -15,3 +16,4 @@ staffRouter.post('/vote', checkRole, voteStaff);
 staffRouter.get('/mostvote', checkRole, mostRegisterVote);
 staffRouter.get('/byuservotes', checkRole, showVotesByUser);
 staffRouter.delete('/deletevote/:idvote', checkRole, deleteVote);
+staffRouter.post('/validlogin', revalidLoginStaff);
