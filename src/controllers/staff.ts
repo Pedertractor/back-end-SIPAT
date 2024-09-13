@@ -169,7 +169,7 @@ export const loginStaff: RequestHandler = async (req, res) => {
           { expiresIn: '2h' }
         );
 
-        if (token) res.status(200).json({ staff: authCollaborator.id, token });
+        if (token) res.status(200).json({ token });
       }
     }
   } catch (error) {
@@ -180,9 +180,10 @@ export const loginStaff: RequestHandler = async (req, res) => {
   }
 };
 
-export const voteStaff: RequestHandler = async (req, res) => {
+export const voteStaff: RequestHandler = async (req: TypeRequestUser, res) => {
   try {
-    const { collaboratorId, registerId } = req.body;
+    const { registerId } = req.body;
+    const collaboratorId = req.collaboratorId;
 
     if (collaboratorId && registerId) {
       const statusNewVote = await prisma.vote.create({
