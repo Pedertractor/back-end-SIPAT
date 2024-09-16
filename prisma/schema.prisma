@@ -34,6 +34,8 @@ model Register {
 
 model Vote {
   id             Int              @id @default(autoincrement())
+  like           Boolean          @default(false)
+  deslike        Boolean          @default(false)
   register       Register         @relation(fields: [registerId], references: [id])
   registerId     Int
   collaborator   BaseCollaborator @relation(fields: [collaboratorId], references: [id])

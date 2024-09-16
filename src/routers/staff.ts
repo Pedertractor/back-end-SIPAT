@@ -2,6 +2,7 @@ import express from 'express';
 import {
   deleteVote,
   forVoting,
+  likeOrDeslike,
   loginStaff,
   mostRegisterVote,
   revalidLoginStaff,
@@ -19,3 +20,4 @@ staffRouter.get('/forvoting', checkRole, forVoting);
 staffRouter.get('/byuservotes', checkRole, showVotesByUser);
 staffRouter.delete('/deletevote/:idvote', checkRole, deleteVote);
 staffRouter.post('/validlogin', revalidLoginStaff);
+staffRouter.put('/vote/update/:idvote', likeOrDeslike);

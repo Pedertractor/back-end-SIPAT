@@ -7,6 +7,43 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 const SECRET_KEY: string | undefined = process.env.SECRET_KEY;
 
+export const likeOrDeslike: RequestHandler = async (
+  req: TypeRequestUser,
+  res
+) => {
+  try {
+    const collaboratorId = req.collaboratorId;
+    const { idvote } = req.params;
+    const { status } = req.body;
+    if (collaboratorId && idvote) {
+      const statusUpdateVote = await prisma.vote.update({
+        where: {
+          id: +idvote,
+          collaboratorId: +collaboratorId,
+        },
+        data: {
+          like: status.like,
+          deslike: status.deslike,
+        },
+      });
+
+      if (!statusUpdateVote)
+        return res.status(422).json({
+          message: 'erro ao atualizar voto',
+        });
+
+      res.status(200).json({
+        message: 'voto atualizado com sucesso!',
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'erro interno no servidor',
+    });
+  }
+};
+
 export const deleteVote: RequestHandler = async (req: TypeRequestUser, res) => {
   try {
     const collaboratorId = req.collaboratorId;
@@ -222,7 +259,7 @@ export const loginStaff: RequestHandler = async (req, res) => {
 
 export const voteStaff: RequestHandler = async (req: TypeRequestUser, res) => {
   try {
-    const { registerId } = req.body;
+    const { registerId, status } = req.body;
     const collaboratorId = req.collaboratorId;
 
     console.log(registerId, collaboratorId);
@@ -232,6 +269,8 @@ export const voteStaff: RequestHandler = async (req: TypeRequestUser, res) => {
         data: {
           registerId: +registerId,
           collaboratorId: +collaboratorId,
+          like: status.like,
+          deslike: status.deslike,
         },
       });
 
