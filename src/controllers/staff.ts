@@ -37,6 +37,46 @@ export const deleteVote: RequestHandler = async (req: TypeRequestUser, res) => {
   }
 };
 
+export const forVoting: RequestHandler = async (req: TypeRequestUser, res) => {
+  try {
+    const collaboratorId = req.collaboratorId;
+
+    if (collaboratorId) {
+      const allPhrasesNeedVote = await prisma.register.findMany({
+        where: {
+          NOT: {
+            Vote: {
+              some: {
+                collaboratorId: +collaboratorId,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          phrase: true,
+          howToContribute: true,
+          _count: true,
+
+          collaborator: {
+            select: {
+              name: true,
+              cardNumber: true,
+              leader: true,
+              costCenter: true,
+              industry: true,
+            },
+          },
+        },
+      });
+
+      res.status(200).json(allPhrasesNeedVote);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const showVotesByUser: RequestHandler = async (
   req: TypeRequestUser,
   res
@@ -185,6 +225,8 @@ export const voteStaff: RequestHandler = async (req: TypeRequestUser, res) => {
     const { registerId } = req.body;
     const collaboratorId = req.collaboratorId;
 
+    console.log(registerId, collaboratorId);
+
     if (collaboratorId && registerId) {
       const statusNewVote = await prisma.vote.create({
         data: {
@@ -199,7 +241,7 @@ export const voteStaff: RequestHandler = async (req: TypeRequestUser, res) => {
         });
 
       res.status(200).json({
-        message: ' voto realizado com sucesso!',
+        message: 'voto realizado com sucesso!',
       });
     }
   } catch (error) {
