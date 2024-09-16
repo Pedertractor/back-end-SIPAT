@@ -41,7 +41,7 @@ export const createNewPhrase: RequestHandler = async (
 
       if (!findCollaborator)
         return res.status(404).json({
-          message: 'colaborador não encontado',
+          message: 'colaborador não encontrado',
         });
 
       const filterSector = findCollaborator.descCostCenter
@@ -59,6 +59,10 @@ export const createNewPhrase: RequestHandler = async (
           howToContribute,
           collaboratorId: +collaboratorId,
           imgPath: imagemPath,
+        },
+        select: {
+          howToContribute: true,
+          phrase: true,
         },
       });
 

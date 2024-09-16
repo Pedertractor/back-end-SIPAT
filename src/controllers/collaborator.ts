@@ -26,7 +26,7 @@ export const checkCollaborator: RequestHandler = async (req, res) => {
       if (!cpfMatch)
         return res
           .status(403)
-          .json({ message: 'cpf e/ou cartão estão incorretos' });
+          .json({ message: 'CPF e/ou cartão estão incorretos, verifique!' });
 
       const authCollaborator = await prisma.baseCollaborator.findUnique({
         where: {
@@ -55,7 +55,7 @@ export const checkCollaborator: RequestHandler = async (req, res) => {
 
       if (existRegister)
         return res.status(400).json({
-          message: 'você já tem uma frase cadastrada! Obrigado!',
+          message: 'Você já tem uma frase cadastrada! Obrigado!',
         });
 
       if (SECRET_KEY) {
