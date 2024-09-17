@@ -20,4 +20,4 @@ staffRouter.get('/forvoting', checkRole, forVoting);
 staffRouter.get('/byuservotes', checkRole, showVotesByUser);
 staffRouter.delete('/deletevote/:idvote', checkRole, deleteVote);
 staffRouter.post('/validlogin', revalidLoginStaff);
-staffRouter.put('/vote/update/:idvote', likeOrDeslike);
+staffRouter.put('/vote/update/:idvote', checkRole, likeOrDeslike);
