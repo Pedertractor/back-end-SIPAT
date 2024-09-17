@@ -7,36 +7,37 @@ async function getCollaboratorWithMakeRegister() {
   try {
     const allColaboratorMakeRegister = await prisma.register.findMany({
       select: {
-        id: true,
-        phrase: true,
-        howToContribute: true,
-        createdAt: true,
-        collaborator: {
-          select: {
-            name: true,
-            cardNumber: true,
-            leader: true,
-            costCenter: true,
-            descCostCenter: true,
-            industry: true,
-          },
-        },
+        collaboratorId: true,
       },
     });
 
-    console.log(allColaboratorMakeRegister);
+    const registeredIds = allColaboratorMakeRegister.map(
+      (item) => item.collaboratorId
+    );
 
-    const formattedData = allColaboratorMakeRegister.map((item) => ({
+    const allCollaborators = await prisma.baseCollaborator.findMany({
+      select: {
+        id: true,
+        name: true,
+        cardNumber: true,
+        leader: true,
+        costCenter: true,
+        descCostCenter: true,
+        industry: true,
+      },
+    });
+
+    const nonRegisteredCollaborators = allCollaborators.filter(
+      (collaborator) => !registeredIds.includes(collaborator.id)
+    );
+    const formattedData = nonRegisteredCollaborators.map((item) => ({
       id: item.id,
-      frase: item.phrase,
-      como_contribuir: item.howToContribute,
-      enviado: new Date(item.createdAt).toLocaleDateString(),
-      nome: item.collaborator.name,
-      cartao: item.collaborator.cardNumber,
-      lider: item.collaborator.leader,
-      c_c: item.collaborator.costCenter,
-      setor: item.collaborator.descCostCenter,
-      industria: item.collaborator.industry,
+      nome: item.name,
+      cartao: item.cardNumber,
+      lider: item.leader,
+      c_c: item.costCenter,
+      setor: item.descCostCenter,
+      industria: item.industry,
     }));
 
     const ws = xlsx.utils.json_to_sheet(formattedData);
