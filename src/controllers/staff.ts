@@ -164,13 +164,6 @@ export const showVotesByUser: RequestHandler = async (
 export const mostRegisterVote: RequestHandler = async (req, res) => {
   try {
     const ranking = await prisma.register.findMany({
-      where: {
-        Vote: {
-          every: {
-            like: true,
-          },
-        },
-      },
       select: {
         id: true,
         phrase: true,
