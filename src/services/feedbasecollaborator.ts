@@ -42,6 +42,6 @@ async function excelConvert(filePath: string) {
   }
 }
 
-const filePath = path.join('../../../dados/RELACAO_FUNC_08_2024.xlsx');
+const filePath = path.join('../../../dados/RELACAO_FUNC_09_2024.xlsx');
 
 excelConvert(filePath);
