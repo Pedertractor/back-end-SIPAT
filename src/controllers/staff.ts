@@ -168,7 +168,15 @@ export const mostRegisterVote: RequestHandler = async (req, res) => {
         id: true,
         phrase: true,
         howToContribute: true,
-        _count: true,
+        _count: {
+          select: {
+            Vote: {
+              where: {
+                deslike: false,
+              },
+            },
+          },
+        },
 
         collaborator: {
           select: {
