@@ -172,7 +172,8 @@ export const mostRegisterVote: RequestHandler = async (req, res) => {
           select: {
             Vote: {
               where: {
-                deslike: false,
+                like: true, 
+                deslike:false
               },
             },
           },
