@@ -27,6 +27,13 @@ export const checkRole: RequestHandler = async (
             id: decoded.id,
             name: decoded.name,
           },
+          select: {
+            id: true,
+            leader: true,
+            descCostCenter: true,
+            name: true,
+            cardNumber: true,
+          },
         });
 
         if (user) {
@@ -35,6 +42,7 @@ export const checkRole: RequestHandler = async (
           req.sector = user.descCostCenter;
           req.name = user.name;
           req.card = user.cardNumber;
+
           next();
         }
       }

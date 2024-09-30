@@ -8,17 +8,18 @@ datasource db {
 }
 
 model BaseCollaborator {
-  id             Int       @id @default(autoincrement())
-  name           String
-  cardNumber     String
-  cpf            String    @unique
-  leader         String
-  costCenter     String
-  descCostCenter String
-  industry       String
-  Register       Register?
-  role           String    @default("USER")
-  Vote           Vote[]
+  id              Int               @id @default(autoincrement())
+  name            String
+  cardNumber      String
+  cpf             String            @unique
+  leader          String
+  costCenter      String
+  descCostCenter  String
+  industry        String
+  Register        Register?
+  acceptCondition AcceptConditions?
+  role            String            @default("USER")
+  Vote            Vote[]
 }
 
 model Register {
@@ -43,4 +44,12 @@ model Vote {
   createdAt      DateTime         @default(now())
 
   @@unique([registerId, collaboratorId])
+}
+
+model AcceptConditions {
+  id             Int              @id @default(autoincrement())
+  accept         Boolean
+  date           DateTime         @default(now())
+  collaboratorId Int              @unique
+  collaborator   BaseCollaborator @relation(fields: [collaboratorId], references: [id])
 }

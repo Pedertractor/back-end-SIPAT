@@ -9,7 +9,7 @@ export const createNewPhrase: RequestHandler = async (
   res
 ) => {
   try {
-    const { phrase, howToContribute } = req.body;
+    const { phrase, howToContribute, acceptConditions } = req.body;
     const collaboratorId = req.collaboratorId;
     const imagem = req.file;
 
@@ -22,10 +22,12 @@ export const createNewPhrase: RequestHandler = async (
         },
       });
 
-      if (!statusRegister)
-        return res.status(422).json({
-          message: 'Erro ao criar registro',
-        });
+      const statusAcceptConditions = await prisma.acceptConditions.create({
+        data: {
+          accept: acceptConditions === 'true' ? true : false,
+          collaboratorId: +collaboratorId,
+        },
+      });
 
       return res.status(200).json({
         message: 'Registro sem foto criado com sucesso!',
@@ -66,6 +68,13 @@ export const createNewPhrase: RequestHandler = async (
         },
       });
 
+      const statusAcceptConditions = await prisma.acceptConditions.create({
+        data: {
+          accept: acceptConditions === 'true' ? true : false,
+          collaboratorId: +collaboratorId,
+        },
+      });
+
       res.status(200).json({
         message: 'Registro com foto criado com sucesso!',
         statusCreatedNewPhrase,
@@ -73,6 +82,7 @@ export const createNewPhrase: RequestHandler = async (
       });
     }
   } catch (error) {
+    console.log(error);
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         return res
