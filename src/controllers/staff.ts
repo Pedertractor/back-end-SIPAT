@@ -278,8 +278,6 @@ export const voteStaff: RequestHandler = async (req: TypeRequestUser, res) => {
     const { registerId, status } = req.body;
     const collaboratorId = req.collaboratorId;
 
-    console.log(registerId, collaboratorId);
-
     if (collaboratorId && registerId) {
       const statusNewVote = await prisma.vote.create({
         data: {
