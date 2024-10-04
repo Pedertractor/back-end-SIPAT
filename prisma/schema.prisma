@@ -47,9 +47,11 @@ model Vote {
 }
 
 model AcceptConditions {
-  id             Int              @id @default(autoincrement())
-  accept         Boolean
-  date           DateTime         @default(now())
-  collaboratorId Int              @unique
-  collaborator   BaseCollaborator @relation(fields: [collaboratorId], references: [id])
+  id               Int              @id @default(autoincrement())
+  accept           Boolean
+  date             DateTime         @default(now())
+  acceptanceMethod String
+  addressIp        String?
+  collaboratorId   Int              @unique
+  collaborator     BaseCollaborator @relation(fields: [collaboratorId], references: [id])
 }

@@ -9,80 +9,63 @@ export const createNewPhrase: RequestHandler = async (
   res
 ) => {
   try {
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { phrase, howToContribute, acceptConditions } = req.body;
     const collaboratorId = req.collaboratorId;
     const imagem = req.file;
+    let imagemPath;
 
-    if (!imagem && collaboratorId) {
-      const statusRegister = await prisma.register.create({
-        data: {
-          phrase,
-          howToContribute,
-          collaboratorId: +collaboratorId,
-        },
-      });
+    const findCollaborator = await prisma.baseCollaborator.findUnique({
+      where: {
+        id: collaboratorId,
+      },
+      select: {
+        id: true,
+        descCostCenter: true,
+        leader: true,
+      },
+    });
 
-      const statusAcceptConditions = await prisma.acceptConditions.create({
-        data: {
-          accept: acceptConditions === 'true' ? true : false,
-          collaboratorId: +collaboratorId,
-        },
-      });
+    if (findCollaborator && collaboratorId) {
+      if (imagem) {
+        const filterSector = findCollaborator.descCostCenter
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-zA-Z0-9\s]/g, '');
+        imagemPath = path.join(
+          filterSector + '_' + findCollaborator.leader,
+          imagem.filename
+        );
+      }
 
-      return res.status(200).json({
-        message: 'Registro sem foto criado com sucesso!',
-      });
-    }
-
-    if (imagem && collaboratorId) {
-      const findCollaborator = await prisma.baseCollaborator.findUnique({
-        where: {
-          id: +collaboratorId,
-        },
-      });
-
-      if (!findCollaborator)
-        return res.status(404).json({
-          message: 'colaborador não encontrado',
-        });
-
-      const filterSector = findCollaborator.descCostCenter
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-zA-Z0-9\s]/g, '');
-      const imagemPath = path.join(
-        filterSector + '_' + findCollaborator.leader,
-        imagem.filename
-      );
-
-      const statusCreatedNewPhrase = await prisma.register.create({
-        data: {
-          phrase,
-          howToContribute,
-          collaboratorId: +collaboratorId,
-          imgPath: imagemPath,
-        },
-        select: {
-          howToContribute: true,
-          phrase: true,
-        },
-      });
-
-      const statusAcceptConditions = await prisma.acceptConditions.create({
-        data: {
-          accept: acceptConditions === 'true' ? true : false,
-          collaboratorId: +collaboratorId,
-        },
-      });
+      await prisma.$transaction([
+        prisma.register.create({
+          data: {
+            phrase,
+            howToContribute,
+            collaboratorId: +collaboratorId,
+            imgPath: imagem && imagemPath,
+          },
+        }),
+        prisma.acceptConditions.create({
+          data: {
+            acceptanceMethod: 'CHECKBOX',
+            addressIp: userIp ? userIp.toString() : null,
+            accept: acceptConditions === 'true' ? true : false,
+            collaboratorId: +collaboratorId,
+          },
+        }),
+      ]);
 
       res.status(200).json({
-        message: 'Registro com foto criado com sucesso!',
-        statusCreatedNewPhrase,
-        imagemPath,
+        message: 'Registro criado com sucesso!',
+      });
+    } else {
+      return res.status(404).json({
+        message: 'colaborador não encontrado',
       });
     }
   } catch (error) {
-    console.log(error);
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         return res

@@ -7,21 +7,21 @@ const SECRET_KEY: string | undefined = process.env.SECRET_KEY;
 
 export const checkCollaborator: RequestHandler = async (req, res) => {
   try {
-    const body = req.body;
+    const { cardNumber, cpf } = req.body;
 
-    if (body) {
+    if (cardNumber) {
       const collaboratorCard = await prisma.baseCollaborator.findFirst({
         where: {
-          cardNumber: body.cardNumber,
+          cardNumber,
         },
       });
 
       if (!collaboratorCard)
-        return res.status(404).json({
-          message: 'usuário não encontrado',
+        return res.status(403).json({
+          message: 'CPF e/ou cartão estão incorretos, verifique!',
         });
 
-      const cpfMatch = await bcrypt.compare(body.cpf, collaboratorCard.cpf);
+      const cpfMatch = await bcrypt.compare(cpf, collaboratorCard.cpf);
 
       if (!cpfMatch)
         return res
