@@ -53,8 +53,6 @@ async function getCollaboratorWithMakeRegister() {
     }
 
     xlsx.writeFile(wb, filePath);
-
-    console.log(`Arquivo salvo em: ${filePath}`);
   } catch (error) {
     console.log(error);
   }
