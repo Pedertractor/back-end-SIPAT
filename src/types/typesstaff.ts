@@ -6,4 +6,5 @@ export interface TypeRequestUser extends Request {
   leader?: string;
   name?: string;
   card?: string;
+  role?: string;
 }

@@ -9,15 +9,15 @@ import {
   showVotesByUser,
   voteStaff,
 } from '../controllers/staff';
-import { checkRole } from '../middleware/checkcollaboratorauth';
+import { checkStaff } from '../middleware/check-staff';
 
 export const staffRouter = express.Router();
 
 staffRouter.post('/login', loginStaff);
-staffRouter.post('/vote', checkRole, voteStaff);
-staffRouter.get('/mostvote', checkRole, mostRegisterVote);
-staffRouter.get('/forvoting', checkRole, forVoting);
-staffRouter.get('/byuservotes', checkRole, showVotesByUser);
-staffRouter.delete('/deletevote/:idvote', checkRole, deleteVote);
+staffRouter.post('/vote', checkStaff, voteStaff);
+staffRouter.get('/mostvote', checkStaff, mostRegisterVote);
+staffRouter.get('/forvoting', checkStaff, forVoting);
+staffRouter.get('/byuservotes', checkStaff, showVotesByUser);
+staffRouter.delete('/deletevote/:idvote', checkStaff, deleteVote);
 staffRouter.post('/validlogin', revalidLoginStaff);
-staffRouter.put('/vote/update/:idvote', checkRole, likeOrDeslike);
+staffRouter.put('/vote/update/:idvote', checkStaff, likeOrDeslike);

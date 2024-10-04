@@ -172,8 +172,8 @@ export const mostRegisterVote: RequestHandler = async (req, res) => {
           select: {
             Vote: {
               where: {
-                like: true, 
-                deslike:false
+                like: true,
+                deslike: false,
               },
             },
           },
@@ -238,6 +238,11 @@ export const loginStaff: RequestHandler = async (req, res) => {
           id: findCollaboratorByCard.id,
           role: 'ADMIN',
         },
+        select: {
+          id: true,
+          name: true,
+          role: true,
+        },
       });
 
       if (!authCollaborator)
@@ -250,6 +255,7 @@ export const loginStaff: RequestHandler = async (req, res) => {
           {
             id: authCollaborator.id,
             name: authCollaborator.name,
+            role: authCollaborator.role,
           },
           SECRET_KEY,
           { expiresIn: '2h' }
