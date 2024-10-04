@@ -146,10 +146,11 @@ export const showVotesByUser: RequestHandler = async (
         },
       });
 
-      if (!allVotesByUser || allVotesByUser.length <= 0)
+      if (!allVotesByUser || allVotesByUser.length <= 0) {
         return res.status(404).json({
           message: 'você não votou em nenhuma frase ainda!',
         });
+      }
 
       res.status(200).json(allVotesByUser);
     }

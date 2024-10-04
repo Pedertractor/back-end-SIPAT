@@ -112,10 +112,8 @@ export const exportExcelWithDatas: RequestHandler = async (req, res) => {
     const wb = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, ws, 'Sheet1');
 
-    // Gere um buffer para o arquivo Excel
     const buffer = xlsx.write(wb, { bookType: 'xlsx', type: 'buffer' });
 
-    // Defina o cabeçalho para o download do arquivo
     res.set({
       'Content-Disposition': 'attachment; filename="dados.xlsx"',
       'Content-Type':
@@ -123,7 +121,6 @@ export const exportExcelWithDatas: RequestHandler = async (req, res) => {
       'Content-Length': buffer.length,
     });
 
-    // Envie o buffer como resposta
     res.status(200).send(buffer);
   } catch (error) {
     console.log(error);
