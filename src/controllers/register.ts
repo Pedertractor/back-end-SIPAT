@@ -15,6 +15,24 @@ export const createNewPhrase: RequestHandler = async (
     const imagem = req.file;
     let imagemPath;
 
+    const existingRegister = await prisma.register.findFirst({
+      where: {
+        collaboratorId: collaboratorId,
+      },
+    });
+
+    if (existingRegister) {
+      return res
+        .status(409)
+        .json({ message: 'Usuário já possui uma frase registrada!' });
+    }
+
+    if (imagem && acceptConditions === false) {
+      return res
+        .status(409)
+        .json({ message: 'Foto não pode ser enviada sem aceitar os termos!' });
+    }
+
     const findCollaborator = await prisma.baseCollaborator.findUnique({
       where: {
         id: collaboratorId,
