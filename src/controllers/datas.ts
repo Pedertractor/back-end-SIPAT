@@ -124,7 +124,7 @@ export const exportExcelWithDatas: RequestHandler = async (req, res) => {
     });
 
     // Envie o buffer como resposta
-    res.send(buffer);
+    res.status(200).send(buffer);
   } catch (error) {
     console.log(error);
     res.status(500).send('Erro ao gerar o arquivo Excel');

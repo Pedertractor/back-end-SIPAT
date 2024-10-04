@@ -1,20 +1,18 @@
 import { RequestHandler } from 'express';
-import { prisma } from '../services/prisma';
 import jwt from 'jsonwebtoken';
-import { TypeRequestUser } from '../types/typesstaff';
+import { prisma } from '../services/prisma';
 
 const SECRET_KEY: string | undefined = process.env.SECRET_KEY;
 
-export const checkRole: RequestHandler = async (
-  req: TypeRequestUser,
-  res,
-  next
-) => {
+export const verifyAuthToExport: RequestHandler = async (req, res, next) => {
   try {
     if (!req.headers.authorization)
       return res.status(401).json({ message: 'token não encontrado!' });
 
     const token = req.headers.authorization.split(' ')[1];
+
+    if (!SECRET_KEY)
+      return res.status(401).json({ message: 'key não encontrada' });
 
     if (SECRET_KEY) {
       const decoded = jwt.verify(token, SECRET_KEY) as {
@@ -28,27 +26,28 @@ export const checkRole: RequestHandler = async (
             id: decoded.id,
             name: decoded.name,
           },
-          select: {
-            id: true,
-            leader: true,
-            descCostCenter: true,
-            name: true,
-            cardNumber: true,
+        });
+
+        if (!user)
+          return res.status(404).json({ message: 'usuário não encontrado' });
+
+        const checkRole = await prisma.baseCollaborator.findUnique({
+          where: {
+            id: user.id,
+            role: 'ADMIN',
           },
         });
 
-        if (user) {
-          req.collaboratorId = user.id;
-          req.leader = user.leader;
-          req.sector = user.descCostCenter;
-          req.name = user.name;
-          req.card = user.cardNumber;
+        if (!checkRole)
+          return res
+            .status(403)
+            .json({ message: 'você precisa ser um staff!' });
 
-          next();
-        }
+        if (checkRole) next();
       }
     }
   } catch (error) {
+    console.log(error);
     if (error instanceof jwt.TokenExpiredError)
       return res.status(401).json({ message: 'Token expirado' });
     if (error instanceof jwt.JsonWebTokenError)
