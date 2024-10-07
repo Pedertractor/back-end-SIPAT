@@ -19,35 +19,37 @@ export async function inicializeCron() {
       },
     });
 
-    const dataMapped = rows.map((item) => {
-      return {
-        card: item.collaborator.cardNumber,
-        phrase: item.phrase,
-        howToContribute: item.howToContribute,
-      };
-    });
+    if (rows.length > 0) {
+      const dataMapped = rows.map((item) => {
+        return {
+          card: item.collaborator.cardNumber,
+          phrase: item.phrase,
+          howToContribute: item.howToContribute,
+        };
+      });
 
-    const data = dataMapped
-      .map((data) => Object.values(data).join(';'))
-      .join('\n');
+      const data = dataMapped
+        .map((data) => Object.values(data).join(';'))
+        .join('\n');
 
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[:.]/g, '-')
-      .slice(0, 19);
-    const outputPath = path.join(
-      __dirname,
-      '..',
-      'public',
-      'BACKUP',
-      `output_${timestamp}.txt`
-    );
+      const timestamp = new Date()
+        .toISOString()
+        .replace(/[:.]/g, '-')
+        .slice(0, 19);
+      const outputPath = path.join(
+        __dirname,
+        '..',
+        'public',
+        'BACKUP',
+        `output_${timestamp}.txt`
+      );
 
-    if (!fs.existsSync(filePath)) {
-      fs.mkdirSync(filePath, { recursive: true });
+      if (!fs.existsSync(filePath)) {
+        fs.mkdirSync(filePath, { recursive: true });
+      }
+
+      fs.writeFileSync(outputPath, data);
     }
-
-    fs.writeFileSync(outputPath, data);
 
     console.log('Cron Iniciado');
   } catch (error) {
