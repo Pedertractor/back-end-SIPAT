@@ -8,7 +8,7 @@ const SECRET_KEY: string | undefined = process.env.SECRET_KEY;
 export const checkCollaborator: RequestHandler = async (req, res) => {
   try {
     const { cardNumber, cpf } = req.body;
-
+    console.log(cardNumber, cpf);
     if (cardNumber) {
       const collaboratorCard = await prisma.baseCollaborator.findFirst({
         where: {

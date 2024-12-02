@@ -11,10 +11,10 @@ const PORT = typeof process.env.PORT == 'string' ? +process.env.PORT : 8080;
 
 const app = express();
 
-// const corsOptions = {
-//   origin: 'http://sipat.grupopedertractor.com.br',
-//   methods: 'GET, PUT, DELETE, UPDATE, POST',
-// };
+const corsOptions = {
+  origin: 'https://sipat.grupopedertractor.com.br',
+  methods: 'GET, PUT, DELETE, UPDATE, POST',
+};
 
 app.use(cors());
 app.use(express.json());
@@ -22,22 +22,22 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', mainRouter);
 
-const sslServer = https.createServer(
-  {
-    key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
-    cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
-  },
-  app
-);
+// const sslServer = https.createServer(
+//   {
+//     key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
+//     cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.ctr')),
+//   },
+//   app
+// );
 
-sslServer.listen(PORT, SERVER, () => {
-  console.log(`Server running on PORT: ${PORT}, Server: ${SERVER}`);
-
-  inicializeCron();
-});
-
-// app.listen(PORT, SERVER, () => {
+// sslServer.listen(PORT, SERVER, () => {
 //   console.log(`Server running on PORT: ${PORT}, Server: ${SERVER}`);
 
 //   inicializeCron();
 // });
+
+app.listen(PORT, SERVER, () => {
+  console.log(`Server running on PORT: ${PORT}, Server: ${SERVER}`);
+
+  inicializeCron();
+});
